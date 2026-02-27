@@ -11,7 +11,7 @@ func main() {
 	r := gin.Default()
 
 
-	r.GET("/", func(x *gin.Context) {
+	r.GET("/", func(c *gin.Context) {
 		c.Redirect(http.StatusTemporaryRedirect, "https://ctrl-c.club/~fey/")
 	})
 
