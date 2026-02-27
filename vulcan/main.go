@@ -6,10 +6,15 @@ import (
 )
 
 
-
 func main() {
 
 	r := gin.Default()
+
+
+	r.GET("/", func(x *gin.Context) {
+		c.Redirect(http.StatusTemporaryRedirect, "https://ctrl-c.club/~fey/")
+	})
+
 
 	r.GET("/:shortURL", func(c *gin.Context) {
 
@@ -18,7 +23,7 @@ func main() {
 			return
 		}
 
-		c.Redirect(http.StatusTemporaryRedirect, "https://youtu.be/WVZ6r-ld52k")
+		c.Redirect(http.StatusTemporaryRedirect, "https://youtu.be/O9BK3xcRH1g")
 		
 	})
 
