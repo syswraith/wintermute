@@ -15,6 +15,10 @@ func main() {
 		c.Redirect(http.StatusTemporaryRedirect, "https://ctrl-c.club/~fey/")
 	})
 
+	r.POST("/create", func(c *gin.Context) {
+
+	})
+
 
 	r.GET("/:shortURL", func(c *gin.Context) {
 
