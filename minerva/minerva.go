@@ -1,28 +1,32 @@
-package main
+package minerva
 
 import (
-	"fmt"
 	"log"
 	"database/sql"
 	_ "github.com/go-sql-driver/mysql"
 )
 
-
-func main() {
+func Connect()(*sql.DB) {
 	db, err := sql.Open("mysql", "user:password@tcp(127.0.0.1:3306)/wintermute")
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	fmt.Println("db connected")
+	log.Println("Connected to DB!")
 
-	err = db.Ping()
+	return db
+}
+
+func Ping(db *sql.DB) {
+	err := db.Ping()
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println("pinged")
 
+	log.Println("DB Pinged!")
+}
 
+func SelectAll(db *sql.DB) {
 
 	var (
 		shorturl string
@@ -35,7 +39,7 @@ func main() {
 	}
 
 	defer rows.Close()
-
+	
 	for rows.Next() {
 		err := rows.Scan(&shorturl, &longurl)
 		if err != nil {
@@ -45,13 +49,11 @@ func main() {
 		log.Println(shorturl, longurl)
 	}
 
-
 	err = rows.Err()
 
 	if err != nil {
 		log.Fatal(err)
 	}
 
-
-	defer db.Close()
 }
+
