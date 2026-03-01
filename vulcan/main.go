@@ -3,6 +3,7 @@ package main
 import (
 	"net/http"
 	"github.com/gin-gonic/gin"
+	"vulcan/minerva"
 )
 
 
@@ -28,9 +29,16 @@ func main() {
 		}
 
 		c.Redirect(http.StatusTemporaryRedirect, "https://youtu.be/O9BK3xcRH1g")
-		
+
 	})
 
 	r.Run(":31337")
 
+
+	// testing db
+
+	db := minerva.Connect()
+	minerva.Ping(db)
+	minerva.SelectAll(db)
+	db.Close()
 }
