@@ -15,10 +15,16 @@ type postJSON struct {
 
 func main() {
 
+	// connect database
 	db := minerva.Connect()
 
+	// create da router
 	router := gin.Default()
 
+	// endpoints
+	// `/:shortURL` redirect to shorturl
+	// `/create` create shorturl from longurl
+	
 
 	router.GET("/", func(c *gin.Context) {
 		c.Redirect(http.StatusTemporaryRedirect, "https://ctrl-c.club/~fey/")
@@ -58,8 +64,7 @@ func main() {
 
 	})
 
-
-
+	// run on 31337 because we elite B)
 	router.Run(":31337")
 
 }
