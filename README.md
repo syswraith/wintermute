@@ -6,7 +6,8 @@ What's done so far
 
 - [x] gin setup
 - [x] mysql setup
-- [ ] create url logic
+- [x] gorm setup
+- [x] create url logic
 - [ ] fetch url logic
 - [ ] stream logs (kafka)
 - [ ] consume logs
