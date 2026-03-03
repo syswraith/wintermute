@@ -61,6 +61,12 @@ func Create(longURL string, db *gorm.DB) (string, error) {
 }
 
 
+func Fetch(shortURL string, db *gorm.DB) (string, error) {
+	var link Link
+	err := db.
+	Where("short_url = ?", shortURL).
+	First(&link).
+	Error
 
-
-
+	return link.LongURL, err
+}

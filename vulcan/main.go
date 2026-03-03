@@ -48,19 +48,26 @@ func main() {
 
 		shortURL = "https://localhost:31337/" + shortURL
 
-		context.JSON(200, gin.H{"data": shortURL,})
+		context.JSON(http.StatusOK, gin.H{"data": shortURL,})
 
 	})
 
 
 	router.GET("/:shortURL", func(context *gin.Context) {
+		shortURL := context.Params.ByName("shortURL")
 
-		if context.Params.ByName("shortURL") == "whoami" {
+		if shortURL == "whoami" {
 			context.Redirect(http.StatusTemporaryRedirect, "https://syswraith.com")
 			return
 		}
 
-		context.Redirect(http.StatusTemporaryRedirect, "https://youtu.be/O9BK3xcRH1g")
+		longURL, err := minerva.Fetch(shortURL, db)
+
+		if err != nil {
+			context.JSON(http.StatusNotFound, gin.H{"error":"page not found"})
+		}
+
+		context.Redirect(http.StatusTemporaryRedirect, longURL)
 
 	})
 
