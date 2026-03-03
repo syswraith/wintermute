@@ -9,9 +9,8 @@ import (
 )
 
 type postJSON struct {
-	Link string `json:"longURL" binding:"required"`
+	LongURL string `json:"longURL" binding:"required"`
 }
-
 
 
 func main() {
@@ -32,16 +31,16 @@ func main() {
 			context.JSON(400, gin.H{"error":"1"})
 		}
 
-		shortlink, err := minerva.Create(json.Link, db)
+		shortURL, err := minerva.Create(json.LongURL, db)
 
 		if err != nil {
 			log.Fatal("link generation failed")
 
 		}
 
-		shortlink = "https://localhost:31337/" + shortlink
+		shortURL = "https://localhost:31337/" + shortURL
 
-		context.JSON(200, gin.H{"success":"1", "data": shortlink,})
+		context.JSON(200, gin.H{"success":"1", "data": shortURL,})
 
 	})
 

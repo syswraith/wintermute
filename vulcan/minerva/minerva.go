@@ -41,10 +41,10 @@ func ShorturlGenerator(id uint) string {
 }
 
 // create and insert url into db
-func Create(link string, db *gorm.DB) (string, error) {
+func Create(longURL string, db *gorm.DB) (string, error) {
     db.AutoMigrate(&Link{})
 
-    l := Link{ LongURL: link, }
+    l := Link{ LongURL: longURL, }
 
     err := db.Create(&l).Error 
 
@@ -52,12 +52,12 @@ func Create(link string, db *gorm.DB) (string, error) {
 		log.Fatal("create failed")
     }
 
-    short := ShorturlGenerator(l.ID)
+    shortURL := ShorturlGenerator(l.ID)
 
-    err = db.Model(&l).Update("short_url", short).Error
+    err = db.Model(&l).Update("short_url", shortURL).Error
 
 
-    return short, err
+    return shortURL, err
 }
 
 
