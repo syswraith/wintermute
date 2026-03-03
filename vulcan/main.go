@@ -28,7 +28,9 @@ func main() {
 		var json postJSON
 
 		if err := context.ShouldBindJSON(&json); err != nil {
-			context.JSON(400, gin.H{"error":"1"})
+			context.JSON(400, gin.H{
+				"error":err,
+			})
 		}
 
 		shortURL, err := minerva.Create(json.LongURL, db)
@@ -40,7 +42,7 @@ func main() {
 
 		shortURL = "https://localhost:31337/" + shortURL
 
-		context.JSON(200, gin.H{"success":"1", "data": shortURL,})
+		context.JSON(200, gin.H{"data": shortURL,})
 
 	})
 
