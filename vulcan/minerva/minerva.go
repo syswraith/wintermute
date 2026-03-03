@@ -1,59 +1,65 @@
 package minerva
 
 import (
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
 	"log"
-	"fmt"
-	"database/sql"
-	_ "github.com/go-sql-driver/mysql"
+	"math/big"
 )
 
-func Connect()(*sql.DB) {
-	db, err := sql.Open("mysql", "user:password@tcp(127.0.0.1:3306)/wintermute")
+// capital so that it can be exported 
+type Link struct {
+	ID       uint   `gorm:"primaryKey;autoIncrement"`
+	ShortURL string `gorm:"size:16,uniqueIndex"`
+	LongURL  string `gorm:"type:text"`
+}
+
+
+// connecting to db function
+// takes in gormdb as param
+func Connect() (*gorm.DB) {
+	log.Println("called")
+
+	dsn := "user:password@tcp(127.0.0.1:3306)/wintermute?charset=utf8mb4&parseTime=True&loc=Local"
+	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+
 	if err != nil {
-		log.Fatal(err)
+		panic("failed to connect")
+
 	}
 
-	fmt.Println("Connected to DB!")
+	log.Println("db connected")
+
 	return db
 }
 
-func Ping(db *sql.DB) {
-	err := db.Ping()
-	if err != nil {
-		log.Fatal(err)
-	}
 
-	fmt.Println("DB Pinged!")
+// base 26+26+10 logic goes here
+func ShorturlGenerator(id uint) string {
+    id64 := int64(id) + 3844
+    return big.NewInt(id64).Text(62)
 }
 
-func SelectAll(db *sql.DB) {
+// create and insert url into db
+func Create(link string, db *gorm.DB) error {
+    db.AutoMigrate(&Link{})
 
-	var (
-		shorturl string
-		longurl string
-	)
+    l := Link{ LongURL: link, }
 
-	rows, err := db.Query("select * from links;")
-	if err != nil {
-		log.Fatal(err)
-	}
+    if err := db.Create(&l).Error; err != nil {
+        return err
+    }
 
-	defer rows.Close()
-	
-	for rows.Next() {
-		err := rows.Scan(&shorturl, &longurl)
-		if err != nil {
-			log.Fatal(err)
-		}
+    short := ShorturlGenerator(l.ID)
 
-		fmt.Println(shorturl, longurl)
-	}
+    if err := db.Model(&l).Update("short_url", short).Error; err != nil {
+        return err
+    }
 
-	err = rows.Err()
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
+    return nil
 }
+
+
+
+
 
