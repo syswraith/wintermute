@@ -5,13 +5,13 @@ import (
 	"net/http"
 	"vulcan/minerva"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
 type postJSON struct {
 	LongURL string `json:"longURL" binding:"required"`
 }
-
 
 func main() {
 
@@ -21,10 +21,11 @@ func main() {
 	// create da router
 	router := gin.Default()
 
+	router.Use(cors.Default())
+
 	// endpoints
 	// `/:shortURL` redirect to shorturl
 	// `/create` create shorturl from longurl
-	
 
 	router.GET("/", func(c *gin.Context) {
 		c.Redirect(http.StatusTemporaryRedirect, "https://ctrl-c.club/~fey/")
@@ -35,7 +36,7 @@ func main() {
 
 		if err := context.ShouldBindJSON(&json); err != nil {
 			context.JSON(400, gin.H{
-				"error":err,
+				"error": err,
 			})
 		}
 
@@ -46,12 +47,11 @@ func main() {
 
 		}
 
-		shortURL = "https://localhost:31337/" + shortURL
+		shortURL = "http://localhost:31337/" + shortURL
 
-		context.JSON(http.StatusOK, gin.H{"data": shortURL,})
+		context.JSON(http.StatusOK, gin.H{"shortURL": shortURL})
 
 	})
-
 
 	router.GET("/:shortURL", func(context *gin.Context) {
 		shortURL := context.Params.ByName("shortURL")
@@ -64,7 +64,7 @@ func main() {
 		longURL, err := minerva.Fetch(shortURL, db)
 
 		if err != nil {
-			context.JSON(http.StatusNotFound, gin.H{"error":"page not found"})
+			context.JSON(http.StatusNotFound, gin.H{"error": "page not found"})
 		}
 
 		context.Redirect(http.StatusTemporaryRedirect, longURL)
