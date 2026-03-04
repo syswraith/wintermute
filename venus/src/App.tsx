@@ -1,9 +1,7 @@
+import { CreateLink } from "@/components/CreateLink";
+
 export function App() {
-  return (
-    <div className="flex items-center justify-center min-h-screen">
-      <div className="font-medium">Hello World</div>
-    </div>
-  )
+    return <CreateLink/>;
 }
 
-export default App
+export default App;
