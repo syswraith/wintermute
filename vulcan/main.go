@@ -71,6 +71,16 @@ func main() {
 
 	})
 
+	router.GET("/dashboard", func(context *gin.Context) {
+		links, err := minerva.DashboardFetch(db)
+
+		if err != nil {
+			log.Fatal("dashboard links fetching failed")
+		}
+
+		context.JSON(http.StatusOK, links)
+	})
+
 	// run on 31337 because we elite B)
 	router.Run(":31337")
 
