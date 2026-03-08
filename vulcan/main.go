@@ -11,10 +11,10 @@ import (
 
 type postJSON struct {
 	LongURL string `json:"longURL" binding:"required"`
+	Expiry  string `json:"expiry"`
 }
 
 func main() {
-
 	// connect database
 	db := minerva.Connect()
 
@@ -40,17 +40,14 @@ func main() {
 			})
 		}
 
-		shortURL, err := minerva.Create(json.LongURL, db)
-
+		shortURL, err := minerva.Create(json.LongURL, json.Expiry, db)
 		if err != nil {
 			log.Fatal("link generation failed")
-
 		}
 
 		shortURL = "http://localhost:31337/" + shortURL
 
 		context.JSON(http.StatusOK, gin.H{"shortURL": shortURL})
-
 	})
 
 	router.GET("/:shortURL", func(context *gin.Context) {
@@ -62,18 +59,15 @@ func main() {
 		}
 
 		longURL, err := minerva.Fetch(shortURL, db)
-
 		if err != nil {
 			context.JSON(http.StatusNotFound, gin.H{"error": "page not found"})
 		}
 
 		context.Redirect(http.StatusTemporaryRedirect, longURL)
-
 	})
 
 	router.GET("/dashboard", func(context *gin.Context) {
 		links, err := minerva.DashboardFetch(db)
-
 		if err != nil {
 			log.Fatal("dashboard links fetching failed")
 		}
@@ -83,5 +77,4 @@ func main() {
 
 	// run on 31337 because we elite B)
 	router.Run(":31337")
-
 }

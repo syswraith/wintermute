@@ -3,29 +3,29 @@ package minerva
 import (
 	"log"
 	"math/big"
+	"time"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
 
-// capital so that it can be exported
+// Capital so that it can be exported
 type Link struct {
 	ID       uint   `gorm:"primaryKey;autoIncrement"`
 	ShortURL string `gorm:"size:16,uniqueIndex"`
 	LongURL  string `gorm:"type:text"`
+	Expiry   *time.Time
 }
 
-// connecting to db function
-// takes in gormdb as param
+// Connecting to db function
+// Takes in gormdb as param
 func Connect() *gorm.DB {
 	log.Println("called")
 
 	dsn := "user:password@tcp(127.0.0.1:3306)/wintermute?charset=utf8mb4&parseTime=True&loc=Local"
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
-
 	if err != nil {
 		panic("failed to connect")
-
 	}
 
 	log.Println("db connected")
@@ -33,29 +33,45 @@ func Connect() *gorm.DB {
 	return db
 }
 
-// base 26+26+10 logic goes here
+// Base 26+26+10 logic goes here
 func ShorturlGenerator(id uint) string {
 	id64 := int64(id) + 3844
 	return big.NewInt(id64).Text(62)
 }
 
-// create and insert url into db
-func Create(longURL string, db *gorm.DB) (string, error) {
+// Create and insert url into db
+func Create(longURL string, expiry string, db *gorm.DB) (string, error) {
 	db.AutoMigrate(&Link{})
 
-	l := Link{LongURL: longURL}
+	var expiresAt *time.Time
+
+	if expiry != "" {
+		t, err := time.Parse("2006-01-02T15:04", expiry)
+		if err != nil {
+			return "", err
+		}
+		utc := t.UTC()
+		expiresAt = &utc
+	}
+
+	l := Link{
+		LongURL: longURL,
+		Expiry:  expiresAt,
+	}
 
 	err := db.Create(&l).Error
-
 	if err != nil {
-		log.Fatal("create failed")
+		return "", err
 	}
 
 	shortURL := ShorturlGenerator(l.ID)
 
 	err = db.Model(&l).Update("short_url", shortURL).Error
+	if err != nil {
+		return "", err
+	}
 
-	return shortURL, err
+	return shortURL, nil
 }
 
 func Fetch(shortURL string, db *gorm.DB) (string, error) {
@@ -75,5 +91,4 @@ func DashboardFetch(db *gorm.DB) ([]Link, error) {
 		Error
 
 	return links, err
-
 }

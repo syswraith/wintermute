@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input";
 export function CreateLink() {
   const [longURL, setLongURL] = useState<string>("");
   const [shortURL, setShortURL] = useState<string>("");
+  const [expiry, setExpiry] = useState<string>("");
 
   return (
     <div className="flex items-center justify-center h-screen">
@@ -23,25 +24,25 @@ export function CreateLink() {
           <CardDescription>Enter required details</CardDescription>
           <CardAction></CardAction>
         </CardHeader>
+
         <CardContent>
           <form>
             <FieldGroup>
+              {/* URL INPUT */}
               <div className="grid grid-cols-1 gap-4">
                 <Field>
-                  <FieldLabel htmlFor="small-form-name">
-                    URL to shorten
-                  </FieldLabel>
+                  <FieldLabel htmlFor="long-url">URL to shorten</FieldLabel>
+
                   <div className="flex gap-2">
                     <Input
-                      id="small-form-name"
+                      id="long-url"
                       placeholder="Enter URL"
                       required
                       className="flex-1 h-12 text-lg"
                       value={longURL}
-                      onChange={(e) => {
-                        setLongURL(e.target.value);
-                      }}
+                      onChange={(e) => setLongURL(e.target.value)}
                     />
+
                     <Button
                       className="h-12 px-6"
                       type="button"
@@ -60,18 +61,37 @@ export function CreateLink() {
                 </Field>
               </div>
 
+              {/* EXPIRATION FIELD */}
               <div className="grid grid-cols-1 gap-4">
                 <Field>
-                  <FieldLabel htmlFor="small-form-name">
-                    Shortened URL
+                  <FieldLabel htmlFor="expiry">
+                    Expiration Date & Time
                   </FieldLabel>
+
+                  <Input
+                    id="expiry"
+                    type="datetime-local"
+                    className="flex-1 h-12 text-lg"
+                    value={expiry}
+                    min={new Date().toISOString().slice(0, 16)}
+                    onChange={(e) => setExpiry(e.target.value)}
+                  />
+                </Field>
+              </div>
+
+              {/* SHORT URL OUTPUT */}
+              <div className="grid grid-cols-1 gap-4">
+                <Field>
+                  <FieldLabel htmlFor="short-url">Shortened URL</FieldLabel>
+
                   <div className="flex gap-2">
                     <Input
-                      id="small-form-name"
+                      id="short-url"
                       className="flex-1 h-12 text-lg"
                       value={shortURL}
                       readOnly
                     />
+
                     <Button
                       className="h-12 px-6"
                       type="button"
@@ -88,21 +108,29 @@ export function CreateLink() {
                   </div>
                 </Field>
               </div>
+
+              {/* SUBMIT */}
               <Field orientation="vertical">
                 <Button
                   className="h-12 px-6"
                   type="button"
                   onClick={async () => {
+                    if (longURL == "") return;
+
                     const url = "http://localhost:31337/create";
+
                     const res = await fetch(url, {
                       method: "POST",
                       headers: {
                         "Content-Type": "application/json",
                       },
-                      body: JSON.stringify({ longURL }),
+                      body: JSON.stringify({
+                        longURL,
+                        expiry,
+                      }),
                     });
 
-                    if (res.status == 200) {
+                    if (res.status === 200) {
                       const data = await res.json();
                       setShortURL(data.shortURL || "");
                     }
