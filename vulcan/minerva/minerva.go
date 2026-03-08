@@ -1,6 +1,7 @@
 package minerva
 
 import (
+	"errors"
 	"log"
 	"math/big"
 	"time"
@@ -41,17 +42,14 @@ func ShorturlGenerator(id uint) string {
 
 // Create and insert url into db
 func Create(longURL string, expiry string, db *gorm.DB) (string, error) {
-	db.AutoMigrate(&Link{})
-
 	var expiresAt *time.Time
 
 	if expiry != "" {
-		t, err := time.Parse("2006-01-02T15:04", expiry)
+		t, err := time.ParseInLocation("2006-01-02T15:04", expiry, time.Local)
 		if err != nil {
 			return "", err
 		}
-		utc := t.UTC()
-		expiresAt = &utc
+		expiresAt = &t
 	}
 
 	l := Link{
@@ -59,15 +57,13 @@ func Create(longURL string, expiry string, db *gorm.DB) (string, error) {
 		Expiry:  expiresAt,
 	}
 
-	err := db.Create(&l).Error
-	if err != nil {
+	if err := db.Create(&l).Error; err != nil {
 		return "", err
 	}
 
 	shortURL := ShorturlGenerator(l.ID)
 
-	err = db.Model(&l).Update("short_url", shortURL).Error
-	if err != nil {
+	if err := db.Model(&l).Update("short_url", shortURL).Error; err != nil {
 		return "", err
 	}
 
@@ -80,6 +76,10 @@ func Fetch(shortURL string, db *gorm.DB) (string, error) {
 		Where("short_url = ?", shortURL).
 		First(&link).
 		Error
+
+	if link.Expiry != nil && time.Now().After(*link.Expiry) {
+		err = errors.New("link expired")
+	}
 
 	return link.LongURL, err
 }

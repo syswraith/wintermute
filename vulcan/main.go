@@ -21,6 +21,11 @@ func main() {
 	// create da router
 	router := gin.Default()
 
+	err := db.AutoMigrate(&minerva.Link{})
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	router.Use(cors.Default())
 
 	// endpoints
@@ -60,9 +65,14 @@ func main() {
 
 		longURL, err := minerva.Fetch(shortURL, db)
 		if err != nil {
-			context.JSON(http.StatusNotFound, gin.H{"error": "page not found"})
-		}
+			if err.Error() == "link expired" {
+				context.JSON(http.StatusGone, gin.H{"error": "link expired"})
+				return
+			}
 
+			context.JSON(http.StatusNotFound, gin.H{"error": "page not found"})
+			return
+		}
 		context.Redirect(http.StatusTemporaryRedirect, longURL)
 	})
 
