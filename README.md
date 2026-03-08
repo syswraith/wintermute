@@ -10,6 +10,8 @@ Wip url shortener (and some more stuff, hopefully).
 - [x] create url logic
 - [x] fetch url logic
 - [x] create url frontend
+- [x] expiry
+- [ ] auth (jwt)
 - [ ] stream logs (kafka)
 - [ ] consume logs
 
