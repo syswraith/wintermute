@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func CreateRoute(router *gin.Engine, c *controllers.Control) {
-	router.POST("/create", c.CreateLink)
+func CreateRoute(router *gin.Engine, h *controllers.Handler) {
+	router.POST("/create", h.CreateLink)
 }
 

@@ -1,11 +1,13 @@
 package controllers
 
-import "gorm.io/gorm"
+import (
+	"vulcan/internal/repository"
+)
 
-type Control struct {
-	DB *gorm.DB
+type Handler struct {
+	Repo *repository.Repository
 }
 
-func Init(db *gorm.DB) *Control {
-	return &Control{DB: db}
+func Init(repo *repository.Repository) *Handler {
+	return &Handler{Repo: repo}
 }

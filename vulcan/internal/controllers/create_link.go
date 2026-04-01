@@ -7,10 +7,9 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"vulcan/internal/models"
-	"vulcan/internal/repository"
 )
 
-func (c *Control) CreateLink(context *gin.Context) {
+func (h *Handler) CreateLink(context *gin.Context) {
 	var json models.PostJSON
 
 	if err := context.ShouldBindJSON(&json); err != nil {
@@ -20,7 +19,7 @@ func (c *Control) CreateLink(context *gin.Context) {
 		return
 	}
 
-	shortURL, err := repository.Create(json.LongURL, json.Expiry, c.DB)
+	shortURL, err := h.Repo.Create(json.LongURL, json.Expiry)
 	if err != nil {
 		log.Println("error generating link:", err)
 		context.JSON(http.StatusInternalServerError, gin.H{"error": "link generation failed"})
@@ -31,4 +30,3 @@ func (c *Control) CreateLink(context *gin.Context) {
 
 	context.JSON(http.StatusOK, gin.H{"shortURL": shortURL})
 }
-

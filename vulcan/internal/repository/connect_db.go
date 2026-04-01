@@ -7,7 +7,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func Connect() *gorm.DB {
+func Connect() *Repository {
 	log.Println("called")
 
 	dsn := "user:password@tcp(127.0.0.1:3306)/wintermute?charset=utf8mb4&parseTime=True&loc=Local"
@@ -18,5 +18,5 @@ func Connect() *gorm.DB {
 
 	log.Println("db connected")
 
-	return db
+	return &Repository{DB: db}
 }

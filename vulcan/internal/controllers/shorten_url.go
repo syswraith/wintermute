@@ -2,12 +2,11 @@ package controllers
 
 import (
 	"net/http"
-	"vulcan/internal/repository"
 
 	"github.com/gin-gonic/gin"
 )
 
-func (c *Control) ShortenURL(context *gin.Context) {
+func (h *Handler) ShortenURL(context *gin.Context) {
 	shortURL := context.Params.ByName("shortURL")
 
 	if shortURL == "whoami" {
@@ -15,7 +14,7 @@ func (c *Control) ShortenURL(context *gin.Context) {
 		return
 	}
 
-	longURL, err := repository.Fetch(shortURL, c.DB)
+	longURL, err := h.Repo.Fetch(shortURL)
 	if err != nil {
 		if err.Error() == "link expired" {
 			context.JSON(http.StatusGone, gin.H{"error": "link expired"})
@@ -27,4 +26,3 @@ func (c *Control) ShortenURL(context *gin.Context) {
 	}
 	context.Redirect(http.StatusTemporaryRedirect, longURL)
 }
-

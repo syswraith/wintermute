@@ -3,13 +3,12 @@ package repository
 import (
 	"time"
 
-	"gorm.io/gorm"
-
 	"vulcan/internal/models"
 )
 
-func Create(longURL string, expiry string, db *gorm.DB) (string, error) {
+func (repo *Repository) Create(longURL string, expiry string) (string, error) {
 	var expiresAt *time.Time
+	db := repo.DB
 
 	if expiry != "" {
 		t, err := time.ParseInLocation("2006-01-02T15:04", expiry, time.Local)

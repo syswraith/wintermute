@@ -4,13 +4,13 @@ import (
 	"errors"
 	"time"
 
-	"gorm.io/gorm"
-
 	"vulcan/internal/models"
 )
 
-func Fetch(shortURL string, db *gorm.DB) (string, error) {
+func (repo *Repository) Fetch(shortURL string) (string, error) {
 	var link models.Link
+	db := repo.DB
+
 	err := db.
 		Where("short_url = ?", shortURL).
 		First(&link).

@@ -15,10 +15,11 @@ import (
 
 func main() {
 	// connect database
-	db := repository.Connect()
+	repo := repository.Connect()
+	db := repo.DB
 
 	// initialize controllers
-	c := controllers.Init(db)
+	c := controllers.Init(repo)
 
 	// create da router
 	router := gin.Default()
@@ -38,9 +39,8 @@ func main() {
 	routes.CreateRoute(router, c)
 	routes.DashboardRoute(router, c)
 	routes.ShortURLRoute(router, c)
+	routes.LoginRoute(router)
 
 	// run on 31337 because we elite B)
 	router.Run(":31337")
 }
-
-

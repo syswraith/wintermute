@@ -4,13 +4,11 @@ import (
 	"log"
 	"net/http"
 
-	"vulcan/internal/repository"
-
 	"github.com/gin-gonic/gin"
 )
 
-func (c *Control) Dashboard(context *gin.Context) {
-	links, err := repository.DashboardFetch(c.DB)
+func (h *Handler) Dashboard(context *gin.Context) {
+	links, err := h.Repo.DashboardFetch()
 	if err != nil {
 		log.Println("error fetching dashboard links:", err)
 		context.JSON(http.StatusInternalServerError, gin.H{"error": "dashboard links fetching failed"})
@@ -19,4 +17,3 @@ func (c *Control) Dashboard(context *gin.Context) {
 
 	context.JSON(http.StatusOK, links)
 }
-

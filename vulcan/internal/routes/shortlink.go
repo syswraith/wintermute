@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func ShortURLRoute(router *gin.Engine, c *controllers.Control) {
-	router.GET("/:shortURL", c.ShortenURL)
+func ShortURLRoute(router *gin.Engine, h *controllers.Handler) {
+	router.GET("/:shortURL", h.ShortenURL)
 }
 
