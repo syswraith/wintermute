@@ -87,5 +87,32 @@ func LoginHandler(context *gin.Context) {
 	context.JSON(http.StatusOK, gin.H{
 		"token": token,
 	})
+}
 
+// RequireAuth is a middleware that enforces JWT authentication
+func RequireAuth() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		authHeader := c.GetHeader("Authorization")
+		if authHeader == "" {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "missing authorization header"})
+			return
+		}
+
+		const prefix = "Bearer "
+		if len(authHeader) <= len(prefix) || authHeader[:len(prefix)] != prefix {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "invalid token format"})
+			return
+		}
+
+		tokenString := authHeader[len(prefix):]
+
+		username, err := verifyToken(tokenString)
+		if err != nil {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "invalid or expired token"})
+			return
+		}
+
+		c.Set("username", username)
+		c.Next()
+	}
 }
