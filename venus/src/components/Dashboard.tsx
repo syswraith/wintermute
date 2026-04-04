@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Navbar } from "@/components/Navbar";
 import {
   Table,
   TableBody,
@@ -22,9 +23,15 @@ export function Dashboard() {
   useEffect(() => {
     const fetchJsonLinks = async () => {
       const url = "http://localhost:31337/dashboard";
-      const res = await fetch(url);
-      const jsonLinks = await res.json();
-      setLinks(jsonLinks);
+      const res = await fetch(url, {
+        headers: {
+          "Authorization": `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+      if (res.ok) {
+        const jsonLinks = await res.json();
+        setLinks(jsonLinks);
+      }
     };
 
     fetchJsonLinks();
@@ -54,8 +61,10 @@ export function Dashboard() {
   };
 
   return (
-    <div className="flex justify-center mt-10 px-8">
-      <div className="w-full max-w-4xl">
+    <div className="flex flex-col min-h-screen">
+      <Navbar />
+      <div className="flex justify-center mt-10 px-8">
+        <div className="w-full max-w-4xl">
         <Table>
           <TableHeader>
             <TableRow>
@@ -86,6 +95,7 @@ export function Dashboard() {
           </TableBody>
         </Table>
       </div>
+    </div>
     </div>
   );
 }

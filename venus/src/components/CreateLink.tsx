@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Navbar } from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -17,8 +18,10 @@ export function CreateLink() {
   const [expiry, setExpiry] = useState<string>("");
 
   return (
-    <div className="flex items-center justify-center h-screen">
-      <Card className="w-full max-w-2xl">
+    <div className="flex flex-col h-screen">
+      <Navbar />
+      <div className="flex flex-1 items-center justify-center p-4">
+        <Card className="w-full max-w-2xl">
         <CardHeader>
           <CardTitle>Create Link</CardTitle>
           <CardDescription>Enter required details</CardDescription>
@@ -123,6 +126,7 @@ export function CreateLink() {
                       method: "POST",
                       headers: {
                         "Content-Type": "application/json",
+                        "Authorization": `Bearer ${localStorage.getItem("token")}`,
                       },
                       body: JSON.stringify({
                         longURL,
@@ -143,6 +147,7 @@ export function CreateLink() {
           </form>
         </CardContent>
       </Card>
+      </div>
     </div>
   );
 }

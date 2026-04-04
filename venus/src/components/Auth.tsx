@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
@@ -17,9 +18,10 @@ import {
 import { Input } from "@/components/ui/input";
 
 export function Auth({ className, ...props }: React.ComponentProps<"div">) {
+  const navigate = useNavigate();
   const [mode, setMode] = useState<"login" | "register">("login");
 
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
@@ -33,8 +35,8 @@ export function Auth({ className, ...props }: React.ComponentProps<"div">) {
 
     const body =
       mode === "login"
-        ? { email, password }
-        : { email, password, confirmPassword };
+        ? { username, password }
+        : { username, password, confirmPassword };
 
     const res = await fetch(url, {
       method: "POST",
@@ -46,6 +48,11 @@ export function Auth({ className, ...props }: React.ComponentProps<"div">) {
 
     if (res.ok) {
       console.log(`${mode} success`);
+      const data = await res.json().catch(() => ({}));
+      if (data.token) {
+        localStorage.setItem("token", data.token);
+      }
+      navigate("/create");
     } else {
       console.error(`${mode} failed`);
     }
@@ -75,16 +82,16 @@ export function Auth({ className, ...props }: React.ComponentProps<"div">) {
         <CardContent>
           <form onSubmit={handleSubmit}>
             <FieldGroup>
-              {/* Email */}
+              {/* Username */}
               <Field>
-                <FieldLabel htmlFor="email">Email</FieldLabel>
+                <FieldLabel htmlFor="username">Username</FieldLabel>
                 <Input
-                  id="email"
-                  type="email"
-                  placeholder="m@example.com"
+                  id="username"
+                  type="text"
+                  placeholder="admin"
                   required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
                 />
               </Field>
 
